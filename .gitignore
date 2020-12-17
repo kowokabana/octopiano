@@ -10,6 +10,7 @@
 
 # deployment and pwd files
 /.env
+/.env.test
 /helpme.sh
 /start.sh
 /deploy.sh
