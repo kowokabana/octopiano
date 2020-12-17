@@ -2,18 +2,26 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
 use App\Repository\UserRepository;
 use Firebase\JWT\JWT;
+use PhpParser\Node\Expr\Empty_;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class AuthController extends AbstractController
 {
+    private UserRepository $userRepository;
+
+    public function __construct(UserRepository $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
+
     /**
      * @Route("/auth", name="auth")
      */
@@ -27,38 +35,42 @@ class AuthController extends AbstractController
     /**
      * @Route("/auth/register", name="register", methods={"POST"})
      * @param Request $request
-     * @param UserPasswordEncoderInterface $encoder
      * @return JsonResponse
      */
-    public function register(Request $request, UserPasswordEncoderInterface $encoder): JsonResponse
+    public function register(Request $request): JsonResponse
     {
-        $password = $request->get('password');
-        $email = $request->get('email');
-        $user = new User();
-        $user->setPassword($encoder->encodePassword($user, $password));
-        $user->setEmail($email);
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($user);
-        $em->flush();
-        return $this->json([
-            'user' => $user->getEmail()
-        ]);
+        $data = json_decode($request->getContent(), true);
+
+        array_key_exists('firstName', $data) ? $firstName = $data['firstName'] : $firstName = '';
+        array_key_exists('lastName', $data) ? $lastName = $data['lastName'] : $lastName = '';
+        array_key_exists('username', $data) ? $username = $data['username'] : $username = '';
+        array_key_exists('password', $data) ? $password = $data['password'] : $password = '';
+        array_key_exists('email', $data) ? $email = $data['email'] : $email = '';
+
+        if (empty($email) || empty($password)) {
+            throw new NotFoundHttpException('Expecting mandatory parameters!');
+        }
+
+        $this->userRepository->saveUser($firstName, $lastName, $username, $email, $password);
+
+        return new JsonResponse(['status' => 'User created!'], Response::HTTP_CREATED);
     }
 
     /**
      * @Route("/auth/login", name="login", methods={"POST"})
      * @param Request $request
-     * @param UserRepository $userRepository
      * @param UserPasswordEncoderInterface $encoder
      * @return JsonResponse
      */
-    public function login(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $encoder): JsonResponse
+    public function login(Request $request, UserPasswordEncoderInterface $encoder): JsonResponse
     {
-        $user = $userRepository->findOneBy([
-            'email'=>$request->get('email'),
-        ]);
+        $data = json_decode($request->getContent(), true);
+        if(!array_key_exists('email', $data)) throw new NotFoundHttpException('Email must be set');
+        if(!array_key_exists('password', $data)) throw new NotFoundHttpException('Password must be set');
 
-        if (!$user || !$encoder->isPasswordValid($user, $request->get('password'))) {
+        $user = $this->userRepository->findOneBy(['email'=> $data['email']]);
+
+        if (!$user || !$encoder->isPasswordValid($user, $data['password'])) {
             return $this->json([
                 'message' => 'email or password is wrong.',
             ]);

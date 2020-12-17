@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -16,25 +17,31 @@ use Psr\Log\LoggerInterface;
  */
 class UserRepository extends ServiceEntityRepository
 {
-    private $logger;
+    private LoggerInterface $logger;
+    private UserPasswordEncoderInterface $encoder;
 
-    public function __construct(ManagerRegistry $registry, LoggerInterface $logger)
+    public function __construct(ManagerRegistry $registry, LoggerInterface $logger, UserPasswordEncoderInterface  $encoder)
     {
         parent::__construct($registry, User::class);
         $this->logger = $logger;
+        $this->encoder = $encoder;
     }
 
-    public function saveUser($firstName, $lastName, $email)
+    public function saveUser($firstName, $lastName, $username, $email, $password)
     {
-        $newUser = new User();
+        $user = new User();
 
-        $newUser
+        $encodedPwd = $this->encoder->encodePassword($user, $password);
+
+        $user
             ->setFirstName($firstName)
             ->setLastName($lastName)
-            ->setEmail($email);
+            ->setUsername($username)
+            ->setEmail($email)
+            ->setPassword($encodedPwd);
 
         try {
-            $this->getEntityManager()->persist($newUser);
+            $this->getEntityManager()->persist($user);
             $this->getEntityManager()->flush();
         } catch (ORMException $e) {
             $this->logger->error($e->getMessage());

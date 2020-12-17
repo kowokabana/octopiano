@@ -51,27 +51,4 @@ class UserController
 
         return new JsonResponse($data, Response::HTTP_OK);
     }
-
-    /**
-     * @Route("/users/", name="add_users", methods={"POST"})
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function add(Request $request): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-
-        $firstName = $data['firstName'];
-        $lastName = $data['lastName'];
-        $email = $data['email'];
-        $phoneNumber = $data['phoneNumber'];
-
-        if (empty($firstName) || empty($lastName) || empty($email) || empty($phoneNumber)) {
-            throw new NotFoundHttpException('Expecting mandatory parameters!');
-        }
-
-        $this->userRepository->saveUser($firstName, $lastName, $email);
-
-        return new JsonResponse(['status' => 'Customer created!'], Response::HTTP_CREATED);
-    }
 }

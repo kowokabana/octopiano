@@ -2,6 +2,12 @@ security:
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
         users_in_memory: { memory: null }
+        users_in_db:
+            entity:
+                class: AppBundle:User
+                property: username
+                # if you're using multiple entity managers
+                # manager_name: customer
     encoders:
         App\Entity\User:
             algorithm: bcrypt
@@ -12,7 +18,8 @@ security:
         main:
             anonymous: true
             lazy: true
-            provider: users_in_memory
+            #provider: users_in_memory
+            provider: users_in_db
             pattern: ^/api
             guard:
                 authenticators:
