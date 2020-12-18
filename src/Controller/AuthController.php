@@ -57,7 +57,7 @@ class AuthController extends AbstractController
         return new JsonResponse(['status' => 'User created!'], Response::HTTP_CREATED);
     }
 
-    private function create_token(string $username): string
+    private function createToken(string $username): string
     {
         $payload = [
             "user" => $username,
@@ -84,7 +84,7 @@ class AuthController extends AbstractController
         if(empty($user->getRoles()))
             throw new NotFoundHttpException('user is deactivated');
 
-        $jwt = $this->create_token($username);
+        $jwt = $this->createToken($username);
 
         return $this->json([
             'message' => 'success!',
@@ -113,7 +113,7 @@ class AuthController extends AbstractController
             ]);
         }
 
-        $jwt = $this->create_token($user->getUsername());
+        $jwt = $this->createToken($user->getUsername());
 
         return $this->json([
             'message' => 'success!',
