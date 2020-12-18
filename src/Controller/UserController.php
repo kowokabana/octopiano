@@ -19,7 +19,7 @@ class UserController
     }
 
     /**
-     * @Route("/api/test/{id}", name="testapi", methods={"GET"})
+     * @Route("/test/{id}", name="testapi", methods={"GET"})
      * @param $id
      * @return JsonResponse
      */

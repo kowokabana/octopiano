@@ -5,7 +5,6 @@ namespace App\Security;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Firebase\JWT\JWT;
-use phpDocumentor\Reflection\Types\Array_;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,7 +55,7 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
             );
             return $this->em->getRepository(User::class)
                 ->findOneBy([
-                    'email' => $jwt['user'],
+                    'username' => $jwt['user'],
                 ]);
         } catch (\Exception $exception) {
             throw new AuthenticationException($exception->getMessage());
