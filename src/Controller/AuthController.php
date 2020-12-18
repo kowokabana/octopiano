@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Intl\Exception\NotImplementedException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -56,6 +57,42 @@ class AuthController extends AbstractController
         return new JsonResponse(['status' => 'User created!'], Response::HTTP_CREATED);
     }
 
+    private function create_token(string $username): string
+    {
+        $payload = [
+            "user" => $username,
+            "exp"  => (new \DateTime())->modify("+15 minutes")->getTimestamp(),
+        ];
+
+        $jwt = JWT::encode($payload, $this->getParameter('jwt_secret'), 'HS256');
+    }
+
+    /**
+     * @Route("/auth/refresh", name="refresh", methods={"POST"})
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function refresh(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if(!array_key_exists('token', $data)) throw new NotFoundHttpException('Access token must be set');
+        $access_token = $data['token'];
+        // TODO: get user from token, even if token is invalid
+        $username = '';
+        $user = $this->userRepository->findOneBy(['username'=> $username]);
+
+        if(empty($user->getRoles()))
+            throw new NotFoundHttpException('user is deactivated');
+
+        $jwt = $this->create_token($username);
+
+        return $this->json([
+            'message' => 'success!',
+            'token' => sprintf('Bearer %s', $jwt),
+        ]);
+    }
+
+
     /**
      * @Route("/auth/login", name="login", methods={"POST"})
      * @param Request $request
@@ -76,12 +113,7 @@ class AuthController extends AbstractController
             ]);
         }
 
-        $payload = [
-            "user" => $user->getUsername(),
-            "exp"  => (new \DateTime())->modify("+15 minutes")->getTimestamp(),
-        ];
-
-        $jwt = JWT::encode($payload, $this->getParameter('jwt_secret'), 'HS256');
+        $jwt = $this->create_token($user->getUsername());
 
         return $this->json([
             'message' => 'success!',
