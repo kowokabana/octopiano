@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  app:
+    image: registry.digitalocean.com/kowo/symfony-app:0.0.2
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - code-volume:/var/www/public
+      - nginx-conf:/etc/nginx/conf.d
+    networks:
+      - code-network
+
+  web:
+    image: nginx:1.15.9-alpine
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - code-volume:/var/www/public
+      - nginx-conf:/etc/nginx/conf.d
+    networks:
+      - code-network
+    depends_on:
+      - app
+
+  db:
+    image: mysql:5.7.32
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pwd
+      MYSQL_ROOT_HOST: '%'
+
+networks:
+  code-network:
+    driver: bridge
+
+volumes:
+  code-volume:
+  nginx-conf:
+  db-data:

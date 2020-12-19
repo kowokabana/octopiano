@@ -9,16 +9,12 @@
 /vendor/
 
 # deployment and pwd files
-/.env
-/.env.test
 /helpme.sh
 /start.sh
 /deploy.sh
 /certs/
-/nginx.conf.d/
-/.dockerignore
-/Dockerfile
-/docker-compose.yml
+/nginx.conf.d/octopiano.com.chained.crt
+/nginx.conf.d/octopiano.com.key
 /.DS_Store
 /.idea
 ###< symfony/framework-bundle ###

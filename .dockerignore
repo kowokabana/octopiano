@@ -1,0 +1,12 @@
+*
+
+!/bin/
+!/config/
+!/nginx.conf.d
+!/public/
+!/src/
+!/templates/
+!/translations/
+!/.env
+!/composer.*
+!/symfony.lock
