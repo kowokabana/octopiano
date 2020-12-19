@@ -122,7 +122,7 @@ class User implements UserInterface, \Serializable
 
     public function serialize(): ?string
     {
-        return serialize(array(
+        return \serialize(array(
             'id' => $this->getId(),
             'firstName' => $this->getFirstName(),
             'lastName' => $this->getLastName(),
@@ -134,12 +134,12 @@ class User implements UserInterface, \Serializable
 
     public function unserialize($serialized)
     {
-        list(
-            $this->id,
-            $this->firstName,
-            $this->lastName,
-            $this->username,
-            $this->password
-            ) = unserialize($serialized);
+        $unserialized = \unserialize($serialized);
+        $this->id = $unserialized['id'];
+        $this->firstName = $unserialized['firstName'];
+        $this->lastName = $unserialized['lastName'];
+        $this->username = $unserialized['username'];
+        $this->password = $unserialized['password'];
+        $this->email = $unserialized['email'];
     }
 }

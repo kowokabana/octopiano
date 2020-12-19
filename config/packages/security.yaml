@@ -4,8 +4,8 @@ security:
         users_in_memory: { memory: null }
         users_in_db:
             entity:
-                class: AppBundle:User
-                property: username
+                class: 'App\Entity\User'
+                property: 'username'
                 # if you're using multiple entity managers
                 # manager_name: customer
     encoders:
@@ -22,8 +22,8 @@ security:
         main:
             #anonymous: true
             #lazy: true
-            provider: users_in_memory
-            #provider: users_in_db
+            #provider: users_in_memory
+            provider: users_in_db
             pattern: ^/api
             guard:
                 authenticators:
