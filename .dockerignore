@@ -8,5 +8,6 @@
 !/templates/
 !/translations/
 !/.env
+!/.env.local
 !/composer.*
 !/symfony.lock
