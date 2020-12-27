@@ -63,7 +63,7 @@ class Score
 
         $splitScript = str_split($scoreScript);
         foreach($splitScript as $c) {
-            if(++$i === count($splitScript) || !empty($notename) && strpos($c, self::notenameCodes)) {
+            if(++$i === count($splitScript) || !empty($notename) && strpos(self::notenameCodes, $c)) {
                 array_push($notes, new Note($notename, $shift, $octave));
                 $notename = '';
                 $shift = '';
@@ -74,25 +74,25 @@ class Score
                     $lengthEx = '';
                 }
             }
-            elseif(strpos($c, self::bracketCodes) == 0)
+            elseif(strpos(self::bracketCodes, $c) === 0)
                 $inBracket = true;
-            elseif(strpos($c, self::bracketCodes) == 1)
+            elseif(strpos(self::bracketCodes, $c) === 1)
                 $inBracket = false;
-            elseif(strpos($c, self::notenameCodes))
+            elseif(strpos(self::notenameCodes, $c))
                 $notename = $c;
-            elseif(empty($shift) && strpos($c, self::shiftCodes))
+            elseif(empty($shift) && strpos(self::shiftCodes, $c))
                 $shift = $c;
-            elseif(empty($octave) && strpos($c, self::octaveCodes))
+            elseif(empty($octave) && strpos(self::octaveCodes, $c))
                 $octave = $c;
-            elseif($c == $octave)
+            elseif($c === $octave)
                 $octave .= $c;
             elseif($inBracket)
                 continue;
-            elseif(empty($length) && strpos($c, self::lengthCodes))
+            elseif(empty($length) && strpos(self::lengthCodes, $c))
                 $length = $c;
-            elseif($c == $length)
+            elseif($c === $length)
                 $length .= $c;
-            elseif($c == self::lengthExtender)
+            elseif($c === self::lengthExtender)
                 $lengthEx .= $c;
         }
 
