@@ -16,4 +16,19 @@ class Note
         $this->shift = $shift;
         $this->octave = $octave;
     }
+
+    public function getNotename(): string
+    {
+        return $this->notename;
+    }
+
+    public function getShift(): string
+    {
+        return $this->shift;
+    }
+
+    public function getOctave(): string
+    {
+        return $this->octave;
+    }
 }
