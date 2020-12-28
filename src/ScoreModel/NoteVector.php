@@ -14,6 +14,9 @@ class NoteVector
         $this->length = $length;
     }
 
+    /**
+    * @return Note[]
+    */
     public function getNotes(): array
     {
         return $this->notes;

@@ -3,6 +3,8 @@
 
 namespace App\ScoreModel;
 
+use App\Common\Util;
+
 
 class Score
 {
@@ -63,7 +65,30 @@ class Score
 
         $splitScript = str_split($scoreScript);
         foreach($splitScript as $c) {
-            if(++$i === count($splitScript) || !empty($notename) && strpos(self::notenameCodes, $c)) {
+            if(strpos(self::bracketCodes, $c) === 0)
+                $inBracket = true;
+            elseif(strpos(self::bracketCodes, $c) === 1)
+                $inBracket = false;
+            elseif(Util::str_contains(self::notenameCodes, $c))
+                $notename = $c;
+            elseif(empty($shift) && Util::str_contains(self::shiftCodes, $c))
+                $shift = $c;
+            elseif(empty($octave) && Util::str_contains(self::octaveCodes, $c))
+                $octave = $c;
+            elseif($c === $octave)
+                $octave .= $c;
+            elseif($inBracket)
+                continue;
+            elseif(empty($length) && Util::str_contains(self::lengthCodes, $c))
+                $length = $c;
+            elseif($c === $length)
+                $length .= $c;
+            elseif($c === self::lengthExtender)
+                $lengthEx .= $c;
+
+            if($i === count($splitScript) ||
+                !empty($notename) && Util::str_contains(self::notenameCodes, $c))
+            {
                 array_push($notes, new Note($notename, $shift, $octave));
                 $notename = '';
                 $shift = '';
@@ -72,28 +97,11 @@ class Score
                     array_push($noteVectors, new NoteVector($notes, $length . $lengthEx));
                     $length = '';
                     $lengthEx = '';
+                    $notes = array();
                 }
             }
-            elseif(strpos(self::bracketCodes, $c) === 0)
-                $inBracket = true;
-            elseif(strpos(self::bracketCodes, $c) === 1)
-                $inBracket = false;
-            elseif(strpos(self::notenameCodes, $c))
-                $notename = $c;
-            elseif(empty($shift) && strpos(self::shiftCodes, $c))
-                $shift = $c;
-            elseif(empty($octave) && strpos(self::octaveCodes, $c))
-                $octave = $c;
-            elseif($c === $octave)
-                $octave .= $c;
-            elseif($inBracket)
-                continue;
-            elseif(empty($length) && strpos(self::lengthCodes, $c))
-                $length = $c;
-            elseif($c === $length)
-                $length .= $c;
-            elseif($c === self::lengthExtender)
-                $lengthEx .= $c;
+
+            $i++;
         }
 
         return $noteVectors;
