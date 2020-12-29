@@ -65,12 +65,24 @@ class Score
 
         $splitScript = str_split($scoreScript);
         foreach($splitScript as $c) {
-            if(strpos(self::bracketCodes, $c) === 0)
+            if(Util::str_contains(self::notenameCodes, $c)) {
+                if(!empty($notename)) {
+                    array_push($notes, new Note($notename, $shift, $octave));
+                    $shift = '';
+                    $octave = '';
+                    if(!$inBracket) {
+                        array_push($noteVectors, new NoteVector($notes, $length . $lengthEx));
+                        $length = '';
+                        $lengthEx = '';
+                        $notes = array();
+                    }
+                }
+                $notename = $c;
+            }
+            elseif(strpos(self::bracketCodes, $c) === 0)
                 $inBracket = true;
             elseif(strpos(self::bracketCodes, $c) === 1)
                 $inBracket = false;
-            elseif(Util::str_contains(self::notenameCodes, $c))
-                $notename = $c;
             elseif(empty($shift) && Util::str_contains(self::shiftCodes, $c))
                 $shift = $c;
             elseif(empty($octave) && Util::str_contains(self::octaveCodes, $c))
@@ -86,24 +98,11 @@ class Score
             elseif($c === self::lengthExtender)
                 $lengthEx .= $c;
 
-            if($i === count($splitScript) ||
-                !empty($notename) && Util::str_contains(self::notenameCodes, $c))
-            {
+            if(++$i === count($splitScript)) {
                 array_push($notes, new Note($notename, $shift, $octave));
-                $notename = '';
-                $shift = '';
-                $octave = '';
-                if(!$inBracket) {
-                    array_push($noteVectors, new NoteVector($notes, $length . $lengthEx));
-                    $length = '';
-                    $lengthEx = '';
-                    $notes = array();
-                }
+                array_push($noteVectors, new NoteVector($notes, $length . $lengthEx));
             }
-
-            $i++;
         }
-
         return $noteVectors;
     }
 }
