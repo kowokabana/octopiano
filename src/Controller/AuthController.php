@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Intl\Exception\NotImplementedException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -64,6 +63,7 @@ class AuthController extends AbstractController
      */
     public function refresh(Request $request): JsonResponse
     {
+        // TODO: continues this implementation...
         $data = json_decode($request->getContent(), true);
         if(!array_key_exists('token', $data)) throw new NotFoundHttpException('Access token must be set');
         $access_token = $data['token'];

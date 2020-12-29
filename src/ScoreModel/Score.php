@@ -10,12 +10,12 @@ class Score
 {
     private array $staffs;
 
-    private const notenameCodes = 'abcdefgr';
-    private const shiftCodes = '#*';
-    private const octaveCodes = "',";
-    private const lengthCodes = "-_";
+    private const notenames = 'abcdefgr';
+    private const shifts = '#*';
+    private const octaves = "',";
+    private const lengths = "-_";
     private const lengthExtender = ".";
-    private const bracketCodes = "()";
+    private const chordBrackets = "()";
 
     public function __construct()
     {
@@ -66,7 +66,7 @@ class Score
         $splitScript = str_split($scoreScript);
         foreach($splitScript as $c) {
             $i++;
-            if(Util::str_contains(self::notenameCodes, $c)) {
+            if(Util::str_contains(self::notenames, $c)) {
                 if(!empty($notename)) {
                     array_push($notes, new Note($notename, $shift, $octave));
                     $shift = '';
@@ -80,26 +80,26 @@ class Score
                 }
                 $notename = $c;
             }
-            elseif(strpos(self::bracketCodes, $c) === 0)
+            elseif(strpos(self::chordBrackets, $c) === 0)
                 $inBracket = true;
-            elseif(strpos(self::bracketCodes, $c) === 1)
+            elseif(strpos(self::chordBrackets, $c) === 1)
                 $inBracket = false;
-            elseif(empty($shift) && Util::str_contains(self::shiftCodes, $c))
+            elseif(empty($shift) && Util::str_contains(self::shifts, $c))
                 $shift = $c;
-            elseif(empty($octave) && Util::str_contains(self::octaveCodes, $c))
+            elseif(empty($octave) && Util::str_contains(self::octaves, $c))
                 $octave = $c;
             elseif($c === substr($octave, 0, 1))
                 $octave .= $c;
             elseif($inBracket)
                 continue;
-            elseif(empty($length) && Util::str_contains(self::lengthCodes, $c))
+            elseif(empty($length) && Util::str_contains(self::lengths, $c))
                 $length = $c;
             elseif($c === substr($length, 0, 1))
                 $length .= $c;
             elseif($c === self::lengthExtender)
                 $lengthEx .= $c;
 
-            if($i === count($splitScript) || strpos(self::bracketCodes, $c) === 0) {
+            if($i === count($splitScript) || strpos(self::chordBrackets, $c) === 0) {
                 if(empty($notename)) continue;
                 array_push($notes, new Note($notename, $shift, $octave));
                 $shift = '';
