@@ -65,6 +65,7 @@ class Score
 
         $splitScript = str_split($scoreScript);
         foreach($splitScript as $c) {
+            $i++;
             if(Util::str_contains(self::notenameCodes, $c)) {
                 if(!empty($notename)) {
                     array_push($notes, new Note($notename, $shift, $octave));
@@ -87,20 +88,27 @@ class Score
                 $shift = $c;
             elseif(empty($octave) && Util::str_contains(self::octaveCodes, $c))
                 $octave = $c;
-            elseif($c === $octave)
+            elseif($c === substr($octave, 0, 1))
                 $octave .= $c;
             elseif($inBracket)
                 continue;
             elseif(empty($length) && Util::str_contains(self::lengthCodes, $c))
                 $length = $c;
-            elseif($c === $length)
+            elseif($c === substr($length, 0, 1))
                 $length .= $c;
             elseif($c === self::lengthExtender)
                 $lengthEx .= $c;
 
-            if(++$i === count($splitScript)) {
+            if($i === count($splitScript) || strpos(self::bracketCodes, $c) === 0) {
+                if(empty($notename)) continue;
                 array_push($notes, new Note($notename, $shift, $octave));
+                $shift = '';
+                $octave = '';
+                $notename = '';
                 array_push($noteVectors, new NoteVector($notes, $length . $lengthEx));
+                $length = '';
+                $lengthEx = '';
+                $notes = array();
             }
         }
         return $noteVectors;

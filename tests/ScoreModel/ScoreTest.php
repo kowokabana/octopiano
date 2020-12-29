@@ -9,12 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class ScoreTest extends TestCase
 {
-    public function testPHP()
-    {
-        $pos = strpos('aec', 'd');
-        $this->assertEquals(5, $pos);
-    }
-
     public function test_parse_simple_script()
     {
         $script = "cdefgab";
@@ -33,16 +27,17 @@ class ScoreTest extends TestCase
 
     public function test_parse_complex_script()
     {
-        $script = "cd--.e__f#'--g*,-a''.b_";
+        $script = "c'''d--.e___f#'--g*,-a''.b_";
         $sut = Score::Parse($script);
 
         $this->assertCount(7, $sut);
         $this->assertEquals('c', $sut[0]->getNotes()[0]->getNotename());
+        $this->assertEquals("'''", $sut[0]->getNotes()[0]->getOctave());
         $this->assertEquals('', $sut[0]->getLength());
         $this->assertEquals('d', $sut[1]->getNotes()[0]->getNotename());
         $this->assertEquals('--.', $sut[1]->getLength());
         $this->assertEquals('e', $sut[2]->getNotes()[0]->getNotename());
-        $this->assertEquals('__', $sut[2]->getLength());
+        $this->assertEquals('___', $sut[2]->getLength());
         $this->assertEquals('f', $sut[3]->getNotes()[0]->getNotename());
         $this->assertEquals('#', $sut[3]->getNotes()[0]->getShift());
         $this->assertEquals("'", $sut[3]->getNotes()[0]->getOctave());
@@ -115,6 +110,9 @@ class ScoreTest extends TestCase
 
     public function test_script_with_mistakes()
     {
+        $script = "(c#''d*,,e)_.(gab)(c''de)(f*'''g#a,,)";
+        $sut = Score::Parse($script);
 
+        $this->assertCount(4, $sut);
     }
 }
