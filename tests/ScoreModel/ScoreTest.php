@@ -108,11 +108,43 @@ class ScoreTest extends TestCase
         $this->assertEquals(',,', $sut[3]->getNotes()[2]->getOctave());
     }
 
-    public function test_script_with_mistakes()
+    public function test_parse_script_with_rest_and_mistakes()
     {
-        $script = "(c#''d*,,e)_.(gab)(c''de)(f*'''g#a,,)";
+        $script = "(c--d_v_er)---(gab)x''*__xx(tzu)(fga)d--#-''tr,,,__";
         $sut = Score::Parse($script);
 
-        $this->assertCount(4, $sut);
+        $this->assertCount(5, $sut);
+        $this->assertEquals('c', $sut[0]->getNotes()[0]->getNotename());
+        $this->assertEquals('d', $sut[0]->getNotes()[1]->getNotename());
+        $this->assertEquals('e', $sut[0]->getNotes()[2]->getNotename());
+        $this->assertEquals('r', $sut[0]->getNotes()[3]->getNotename());
+        $this->assertEquals('---', $sut[0]->getLength());
+        $this->assertEquals('g', $sut[1]->getNotes()[0]->getNotename());
+        $this->assertEquals('a', $sut[1]->getNotes()[1]->getNotename());
+        $this->assertEquals('b', $sut[1]->getNotes()[2]->getNotename());
+        $this->assertEquals('__', $sut[1]->getLength());
+        $this->assertEquals('f', $sut[2]->getNotes()[0]->getNotename());
+        $this->assertEquals('g', $sut[2]->getNotes()[1]->getNotename());
+        $this->assertEquals('a', $sut[2]->getNotes()[2]->getNotename());
+        $this->assertEquals('d', $sut[3]->getNotes()[0]->getNotename());
+        $this->assertEquals("#", $sut[3]->getNotes()[0]->getShift());
+        $this->assertEquals("''", $sut[3]->getNotes()[0]->getOctave());
+        $this->assertEquals('---', $sut[3]->getLength());
+        $this->assertEquals('r', $sut[4]->getNotes()[0]->getNotename());
+        $this->assertEquals('__', $sut[4]->getLength());
+    }
+
+    public function test_parse_single_notes_in_brackets ()
+    {
+        $script = "(c#,,)--(d*'')___r(e)(f)";
+        $sut = Score::Parse($script);
+
+        $this->assertCount(5, $sut);
+        $this->assertEquals('c', $sut[0]->getNotes()[0]->getNotename());
+        $this->assertEquals('#', $sut[0]->getNotes()[0]->getShift());
+        $this->assertEquals(',,', $sut[0]->getNotes()[0]->getOctave());
+        $this->assertEquals('--', $sut[0]->getLength());
+        $this->assertEquals('r', $sut[2]->getNotes()[0]->getNotename());
+        $this->assertEquals('', $sut[2]->getLength());
     }
 }

@@ -10,7 +10,7 @@ class Score
 {
     private array $staffs;
 
-    private const notenameCodes = 'abcdefg';
+    private const notenameCodes = 'abcdefgr';
     private const shiftCodes = '#*';
     private const octaveCodes = "',";
     private const lengthCodes = "-_";
