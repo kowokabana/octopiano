@@ -33,6 +33,12 @@ class Score
      */
     private $song;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="scores")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -68,6 +74,18 @@ class Score
     public function setSong(?Song $song): self
     {
         $this->song = $song;
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
         return $this;
     }
 }
